@@ -10,7 +10,7 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
 			let seriesIdx = null;
 			let dataIdx = null;
 
-			const fmtDate = uPlot.fmtDate("{M}/{D}/{YY} {h}:{mm}:{ss} {AA}");
+			const fmtDate = uPlot.fmtDate("{D}/{M}/{YYYY} {h}:{mm}:{ss} {AA}");
 
 			let over;
 
