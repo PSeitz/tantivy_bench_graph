@@ -10,9 +10,8 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
 			let seriesIdx = null;
 			let dataIdx = null;
 
-			const fmtDate = uPlot.fmtDate("{D}/{M}/{YYYY} {h}:{mm}:{ss} {AA}");
+			const fmtDate = uPlot.fmtDate("{D}/{M}/{YYYY} {h}:{mm}:{ss} ");
 
-			let over;
 
 			let tooltipVisible = false;
 
@@ -39,15 +38,20 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
 				let lft = u.valToPos(u.data[        0][dataIdx], 'x');
 
 				tooltip.style.top  = (tooltipTopOffset  + top + shiftX) + "px";
-				tooltip.style.left = (tooltipLeftOffset + lft + shiftY) + "px";
 
 				//tooltip.style.borderColor = isInterpolated(dataIdx) ? interpolatedColor : seriesColors[seriesIdx - 1];
 				let pctSinceStart = (((u.data[seriesIdx][dataIdx] - u.data[seriesIdx][0]) / u.data[seriesIdx][0]) * 100).toFixed(2);
 				let commit_msg = commit_hash_to_msg[commit_hashes[dataIdx]];
 				tooltip.textContent = (
-					fmtDate(new Date(u.data[0][dataIdx] * 1e3)) + " - " + commit_msg.slice(0,170) + "\n" +
+					fmtDate(new Date(u.data[0][dataIdx] * 1e3)) + "\n" + 
+					commit_msg.slice(0,170) + "\n" +
 					uPlot.fmtNum(u.data[seriesIdx][dataIdx]) + " (" + pctSinceStart + "% since start)"
 				);
+
+				let width = tooltip.getBoundingClientRect().width;
+				tooltip.style.left = (tooltipLeftOffset + lft + shiftY - width/2) + "px";
+
+				
 			}
 
 			return {
@@ -84,8 +88,9 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
 							if (dataIdx != c.idx) {
 								dataIdx = c.idx;
 
-								if (seriesIdx != null)
+								if (seriesIdx != null){
 									setTooltip(u);
+								}
 							}
 						}
 					],
@@ -162,9 +167,10 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
 								plugins: [
                     tooltipPlugin({
                         onclick(u, seriesIdx, dataIdx) {
-                            let thisCommit = commit_hashes[dataIdx][1];
-                            let prevCommit = (commit_hashes[dataIdx - 1] || [null, null])[1];
-                            window.open(`/compare.html?start=${prevCommit}&end=${thisCommit}&stat=${stat}`);
+                            let thisCommit = commit_hashes[dataIdx];
+                            let prevCommit = (commit_hashes[dataIdx - 1] || [null, null]);
+														alert("thisCommit:" + thisCommit + " prevCommit:" + prevCommit);
+                            //window.open(`/compare.html?start=${prevCommit}&end=${thisCommit}`);
                         },
 												commit_hashes,
 												commit_hash_to_msg,
