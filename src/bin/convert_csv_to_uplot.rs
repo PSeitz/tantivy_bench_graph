@@ -80,6 +80,7 @@ fn get_records<R: Read>(reader: R) -> Vec<Record> {
 
         records.push(record);
     }
+    records.sort_by_key(|record| record.commit_ts);
     records
 }
 
