@@ -20,6 +20,7 @@ struct Record {
     rustc_version: String,
     run_date_ts: i64,
     run_date: String,
+    machine_name: String,
 }
 
 // uPlot format
