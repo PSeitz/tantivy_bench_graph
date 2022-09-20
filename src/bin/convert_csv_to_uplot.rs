@@ -1,5 +1,3 @@
-use chrono::NaiveDate;
-use chrono::NaiveDateTime;
 use csv::StringRecord;
 use serde::Serialize;
 use serde_json::json;
@@ -18,19 +16,10 @@ struct Record {
     throughput: Option<f64>,
     commit_hash: String,
     commit_message: String,
-    commit_date: String,
+    commit_ts: u64,
     rustc_version: String,
     run_date_ts: i64,
     run_date: String,
-}
-
-impl Record {
-    // TODO FIX, incomplete date
-    fn get_commit_timestamp(&self) -> u64 {
-        let date = NaiveDate::parse_from_str(&self.commit_date, "%Y-%m-%d").unwrap();
-        let date = NaiveDateTime::new(date, Default::default());
-        date.timestamp() as u64
-    }
 }
 
 // uPlot format
@@ -100,35 +89,9 @@ fn get_uplot_prepared_data(records: &[Record]) -> serde_json::Value {
     let mut variance = vec![];
 
     for record in records {
-        let ts = record.get_commit_timestamp();
-        timestamps.push(ts);
+        timestamps.push(record.commit_ts);
         duration.push(record.ns);
         variance.push(record.variance);
     }
     json!(vec![timestamps, duration, variance])
 }
-
-//fn main() {
-//let mut rdr = csv::Reader::from_reader(io::stdin());
-
-//let mut timestamps = vec![];
-//let mut duration = vec![];
-//let mut variance = vec![];
-
-//for result in rdr.records() {
-//let record: StringRecord = result.unwrap();
-//let record: Record = record.deserialize(None).unwrap();
-
-//let ts = record.get_commit_timestamp();
-//timestamps.push(ts);
-//duration.push(record.ns);
-//variance.push(record.variance);
-//}
-//let json = json!(vec![timestamps, duration, variance]);
-//let jsonstr = serde_json::to_string(&json).unwrap();
-//std::fs::File::create("data2.json")
-//.unwrap()
-//.write_all(jsonstr.as_bytes())
-//.unwrap();
-////println!("{}", jsonstr);
-//}
