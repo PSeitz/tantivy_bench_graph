@@ -23,6 +23,6 @@ enddate=$(date -I -d "$input_end_date + 1 day")     || exit  # +1 to make the ra
 d="$startdate"
 while [ "$d" != "$enddate" ]; do 
   echo "$d"
-  d=$(date -I -d "$d + 1 day")
   ./bench_tantivy.sh -d "$d";
+  d=$(date -I -d "$d + 1 day")
 done
