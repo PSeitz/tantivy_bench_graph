@@ -2,15 +2,15 @@
 # runs tantivy benchmarks for today, updates the graphs and commits to the repository
 # set MACHINE_NAME env if not on awst3
 
+if [[ -z "${MACHINE_NAME}" ]]; then
+  export MACHINE_NAME='awst3'
+fi
+
 git fetch --all
 git rebase
 
 # run benchmarks for today
 ./bench_dates_tantivy.sh
-
-if [[ -z "${MACHINE_NAME}" ]]; then
-  export MACHINE_NAME='awst3'
-fi
 
 # Merge csv files with same name
 cargo run --release --bin merge_results
