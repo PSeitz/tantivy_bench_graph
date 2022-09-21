@@ -48,7 +48,7 @@ run_bench() {
     variance=${bench_result[2]}
     throughput=${bench_result[3]}
 
-    out="$ns,$variance,$throughput,$commit_hash,$commit_message,$commit_timestamp,$rustc_version,$run_date_ts,$run_date"
+    out="$ns,$variance,$throughput,$commit_hash,$commit_message,$commit_timestamp,$commit_date,$rustc_version,$run_date_ts,$run_date"
     echo "$out" >> "bench_results/$bench_name"
 
   done

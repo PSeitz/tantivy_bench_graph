@@ -5,7 +5,7 @@ PATH=$PATH:$PWD
 
 # get command line parameters
 # usage: ./bench_dates -s 2022-08-01 -e 2022-09-01
-# enddate is optional, it defaults to today
+# startdate and enddate are optional, they default to today
 while getopts s:e: flag
 do
     case "${flag}" in

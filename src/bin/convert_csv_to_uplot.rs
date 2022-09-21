@@ -16,7 +16,10 @@ struct Record {
     throughput: Option<f64>,
     commit_hash: String,
     commit_message: String,
+    /// Timestamp of the commit
     commit_ts: u64,
+    /// The tool accepts a date for which the closest commit is selected
+    selected_date: String,
     rustc_version: String,
     run_date_ts: i64,
     run_date: String,
