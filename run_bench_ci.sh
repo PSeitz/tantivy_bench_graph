@@ -5,7 +5,7 @@ git fetch --all
 git rebase
 
 # run benchmarks for today
-./bench_dates_tantivy
+./bench_dates_tantivy.sh
 
 # Merge csv files with same name
 cargo run --release --bin merge_results
