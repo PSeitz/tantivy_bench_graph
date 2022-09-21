@@ -28,6 +28,15 @@ commit_message=$(git log -n 1 --pretty=format:%s "$commit_hash")
 commit_message=${commit_message:0:60}
 commit_message=${commit_message//,/} #remove comma for csv compat
 
+function fail {
+    printf '%s\n' "$1" >&2 ## Send message to stderr.
+    exit "${2-1}" ## Return a code specified by $2, or 1 by default.
+}
+if [[ -z "${MACHINE_NAME}" ]]; then
+  fail "script requires MACHINE_NAME to be set as environment variable, e.g. export MACHINE_NAME=468DX" 
+fi
+machine_name="${MACHINE_NAME}"
+
 echo "Checkout $commit_message ($commit_hash) for commit_date $commit_date"
 
 git checkout "$commit_hash"
@@ -48,7 +57,7 @@ run_bench() {
     variance=${bench_result[2]}
     throughput=${bench_result[3]}
 
-    out="$ns,$variance,$throughput,$commit_hash,$commit_message,$commit_timestamp,$commit_date,$rustc_version,$run_date_ts,$run_date"
+    out="$ns,$variance,$throughput,$commit_hash,$commit_message,$commit_timestamp,$commit_date,$rustc_version,$run_date_ts,$run_date,$machine_name"
     echo "$out" >> "bench_results/$bench_name"
 
   done
