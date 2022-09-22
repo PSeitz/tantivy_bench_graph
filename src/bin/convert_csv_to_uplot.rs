@@ -1,6 +1,6 @@
+use chrono::NaiveDate;
 use csv::StringRecord;
 use serde::Serialize;
-use serde_json::json;
 use std::collections::HashMap;
 use std::fs;
 use std::io::Read;
@@ -19,6 +19,7 @@ struct Record {
     /// Timestamp of the commit
     commit_ts: u64,
     /// The tool accepts a date for which the closest commit is selected
+    /// Format: 2022-09-19
     selected_date: String,
     rustc_version: String,
     run_date_ts: i64,
@@ -26,52 +27,79 @@ struct Record {
     machine_name: String,
 }
 
+impl Record {
+    fn get_selected_date_as_timestamp(&self) -> u64 {
+        NaiveDate::parse_from_str("2015-09-05", "%Y-%m-%d")
+            .unwrap()
+            .and_time(Default::default())
+            .timestamp() as u64
+    }
+}
+
 // uPlot format
 //
 // let data = [
-//  [1546300800, 1546387200],    // x-values (timestamps)  ts commit_date
+//  [1546300800, 1546387200],    // x-values (timestamps)  selected_date (so when it's run once per
+//  day, we get a nice graph)
 //  [        35,         71],    // y-values (series 1)    ns
 //  [        90,         15],    // y-values (series 2)    variance
 // ];
+//
 
-fn main() {
+#[derive(Debug, Deserialize, Serialize)]
+struct DataFormat {
+    commit_hash_to_message: HashMap<String, String>,
+    benchmarks: Vec<BenchMarkInfo>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct BenchMarkInfo {
+    name: String,
+    commit_hashes: Vec<String>,
+    uplot_data: [Vec<u64>; 3], //timestamps, duration, variance
+}
+
+fn main() -> std::io::Result<()> {
     let paths = fs::read_dir("./bench_results").unwrap();
 
-    let mut bench_name_to_result = HashMap::new();
-    let mut commits = HashMap::new();
-    for path in paths {
-        let path = path.unwrap();
-        let bench_test = path.file_name().to_str().unwrap().to_string();
-        let records = get_records(std::fs::File::open(path.path()).unwrap());
+    let mut commit_hash_to_message = HashMap::new();
+
+    let mut benchmarks = Vec::new();
+    for dir_entry in paths.filter_map(|dir_entry| dir_entry.ok()) {
+        let bench_test = dir_entry.file_name().to_str().unwrap().to_string();
+        let records = get_records(std::fs::File::open(dir_entry.path()).unwrap());
         let bench_data_uplot = get_uplot_prepared_data(&records);
-        let mut bench_info = HashMap::new();
-        bench_info.insert("uplot_data", bench_data_uplot);
+
         let commit_hashs = records
             .iter()
             .map(|record| record.commit_hash.to_string())
             .collect::<Vec<_>>();
-        bench_info.insert(
-            "commit_hashes",
-            serde_json::to_value(&commit_hashs).unwrap(),
-        );
-        bench_name_to_result.insert(bench_test, serde_json::to_value(&bench_info).unwrap());
+        let benchmark_info = BenchMarkInfo {
+            name: bench_test,
+            commit_hashes: commit_hashs.to_owned(),
+            uplot_data: bench_data_uplot,
+        };
+        benchmarks.push(benchmark_info);
 
         for record in records {
-            commits.insert(record.commit_hash, record.commit_message);
+            commit_hash_to_message.insert(record.commit_hash, record.commit_message);
         }
     }
 
-    bench_name_to_result.insert(
-        "commits".to_string(),
-        serde_json::to_value(&commits).unwrap(),
-    );
+    benchmarks.sort_by_key(|benchmark| benchmark.name.to_string());
+    let data = DataFormat {
+        commit_hash_to_message,
+        benchmarks,
+    };
 
-    let jsonstr = serde_json::to_string_pretty(&bench_name_to_result).unwrap();
+    let jsonstr = serde_json::to_string_pretty(&data).unwrap();
 
     std::fs::File::create("data.json")
         .unwrap()
         .write_all(jsonstr.as_bytes())
         .unwrap();
+
+    Ok(())
 }
 
 fn get_records<R: Read>(reader: R) -> Vec<Record> {
@@ -88,15 +116,15 @@ fn get_records<R: Read>(reader: R) -> Vec<Record> {
     records
 }
 
-fn get_uplot_prepared_data(records: &[Record]) -> serde_json::Value {
+fn get_uplot_prepared_data(records: &[Record]) -> [Vec<u64>; 3] {
     let mut timestamps = vec![];
     let mut duration = vec![];
     let mut variance = vec![];
 
     for record in records {
-        timestamps.push(record.commit_ts);
+        timestamps.push(record.get_selected_date_as_timestamp());
         duration.push(record.ns);
         variance.push(record.variance);
     }
-    json!(vec![timestamps, duration, variance])
+    [timestamps, duration, variance]
 }

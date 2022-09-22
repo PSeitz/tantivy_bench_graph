@@ -22,7 +22,7 @@ cd tantivy || exit
 
 git fetch --all
 
-commit_hash=$(git rev-list --max-count=1 --first-parent --before="$commit_date" main)
+commit_hash=$(git rev-list --max-count=1 --first-parent --before="$commit_date" origin/main)
 commit_timestamp=$(git log -n 1 --pretty=format:%ct "$commit_hash")
 commit_message=$(git log -n 1 --pretty=format:%s "$commit_hash")
 commit_message=${commit_message:0:60}

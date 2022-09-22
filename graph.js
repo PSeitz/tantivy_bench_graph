@@ -211,14 +211,15 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
 			wait.textContent = "Fetching data.json....";
 
 		
-      fetch("data.json").then(r => r.json()).then(name_and_data => {
-				let commit_hash_to_msg = name_and_data["commits"]
+      fetch("data.json").then(r => r.json()).then(data => {
+				let commit_hash_to_msg = data["commit_hash_to_message"]
+				let benchmarks = data["benchmarks"]
 				wait.textContent = "Rendering...";
-        for (let name in name_and_data) {
-            let data = name_and_data[name]["uplot_data"];
-            let commit_hashes = name_and_data[name]["commit_hashes"];
+        for (let benchmark of benchmarks) {
+            let data = benchmark["uplot_data"];
+            let commit_hashes = benchmark["commit_hashes"];
             if (data && data[0].length > 2){
-				        makeChart(name, data, commit_hashes, commit_hash_to_msg);
+				        makeChart(benchmark.name, data, commit_hashes, commit_hash_to_msg);
             }
         }
         wait.textContent = "";
