@@ -19,6 +19,6 @@ cargo run --release --bin convert_csv_to_uplot
 
 git add -A
 
-#commit_message=$(date +%F)
-#git commit -m"Update benchmarks for $commit_message"
-#git push
+commit_message=$(date +%F)
+git commit -m"Update benchmarks for $commit_message"
+git push
