@@ -29,7 +29,7 @@ struct Record {
 
 impl Record {
     fn get_selected_date_as_timestamp(&self) -> u64 {
-        NaiveDate::parse_from_str("2015-09-05", "%Y-%m-%d")
+        NaiveDate::parse_from_str(&self.selected_date, "%Y-%m-%d")
             .unwrap()
             .and_time(Default::default())
             .timestamp() as u64
