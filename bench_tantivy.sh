@@ -22,6 +22,7 @@ cd tantivy || exit
 
 git fetch --all
 
+# --first-parent is selected so we only look at the merges, not all commits that are included
 commit_hash=$(git rev-list --max-count=1 --first-parent --before="$commit_date" origin/main)
 commit_timestamp=$(git log -n 1 --pretty=format:%ct "$commit_hash")
 commit_message=$(git log -n 1 --pretty=format:%s "$commit_hash")
