@@ -212,11 +212,16 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
 
 		
       fetch("data.json").then(r => r.json()).then(data => {
+
+				let d = new Date();
+				d.setDate(d.getDate()-30);
+ 			 	let ts_30_days_ago = d.getTime() / 1000;
+	
 				let commit_hash_to_msg = data["commit_hash_to_message"]
 				let benchmarks = data["benchmarks"]
 				wait.textContent = "Rendering...";
         for (let benchmark of benchmarks) {
-            let data = benchmark["uplot_data"];
+						let data = filterData(benchmark["uplot_data"], ts_30_days_ago);
             let commit_hashes = benchmark["commit_hashes"];
             if (data && data[0].length > 2){
 				        makeChart(benchmark.name, data, commit_hashes, commit_hash_to_msg);
@@ -225,4 +230,20 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
         wait.textContent = "";
 
 			});
+
+			/// Filter out data by timestamp (e.g. last 30 days)
+			function filterData(data, min_ts){
+					let cut_num_front = 0;
+					for (let timestamp of data[0]){
+						if (timestamp > min_ts){
+								break;
+						}
+						cut_num_front++;
+					}
+					return [
+						data[0].slice(cut_num_front),
+						data[1].slice(cut_num_front),
+						data[2].slice(cut_num_front),
+					]
+			}
 
