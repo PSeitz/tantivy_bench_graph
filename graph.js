@@ -221,8 +221,9 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
 				let benchmarks = data["benchmarks"]
 				wait.textContent = "Rendering...";
         for (let benchmark of benchmarks) {
-						let data = filterData(benchmark["uplot_data"], ts_30_days_ago);
-            let commit_hashes = benchmark["commit_hashes"];
+						let data1 = filterData(benchmark["uplot_data"], benchmark["commit_hashes"], ts_30_days_ago);
+						let data = data1.data;
+            let commit_hashes = data1.commit_hashes;
             if (data && data[0].length > 2){
 				        makeChart(benchmark.name, data, commit_hashes, commit_hash_to_msg);
             }
@@ -232,7 +233,7 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
 			});
 
 			/// Filter out data by timestamp (e.g. last 30 days)
-			function filterData(data, min_ts){
+			function filterData(data, commit_hashes, min_ts){
 					let cut_num_front = 0;
 					for (let timestamp of data[0]){
 						if (timestamp > min_ts){
@@ -240,10 +241,13 @@ function tooltipPlugin({onclick, shiftX = 10, shiftY = 10, commit_hashes, commit
 						}
 						cut_num_front++;
 					}
-					return [
-						data[0].slice(cut_num_front),
-						data[1].slice(cut_num_front),
-						data[2].slice(cut_num_front),
-					]
+					return {
+						data: [
+							data[0].slice(cut_num_front),
+							data[1].slice(cut_num_front),
+							data[2].slice(cut_num_front),
+						],
+						commit_hashes: commit_hashes.slice(cut_num_front)	
+					}
 			}
 
