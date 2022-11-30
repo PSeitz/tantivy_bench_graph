@@ -269,7 +269,6 @@ function get_ts_or_commit(ts_or_commit) {
 function loadData(state) {
     let d = new Date()
     d.setDate(d.getDate() - 30)
-    let ts_30_days_ago = start || d.getTime() / 1000
 
     let start = get_ts_or_commit(state.start) || d.getTime() / 1000
     let end = get_ts_or_commit(state.end)
@@ -286,7 +285,7 @@ function loadData(state) {
                 let data1 = filterData(
                     benchmark['uplot_data'],
                     benchmark['commit_hashes'],
-                    ts_30_days_ago,
+                    start,
                     end
                 )
                 let data = data1.data
