@@ -17,6 +17,9 @@ function loadState(callback) {
     if (state.end) {
         document.getElementById('end-bound').value = state.end
     }
+    if (state.filter) {
+        document.getElementById('filter').value = state.filter
+    }
 
     callback(state)
 }
@@ -288,6 +291,9 @@ function loadData(state) {
                     start,
                     end
                 )
+                if (state.filter && !benchmark.name.includes(state.filter)){
+                    continue;
+                }
                 let data = data1.data
                 let commit_hashes = data1.commit_hashes
                 if (data && data[0].length > 2) {
