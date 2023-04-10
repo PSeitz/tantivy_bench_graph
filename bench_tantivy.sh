@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#set -x
+#set -e
 
 git clone https://github.com/quickwit-oss/tantivy.git 2>/dev/null
 
@@ -40,6 +40,8 @@ machine_name="${MACHINE_NAME}"
 
 echo "Checkout $commit_message ($commit_hash) for commit_date $commit_date"
 
+git restore .
+git clean -fdx
 git checkout "$commit_hash"
 
 #exec bench
