@@ -68,7 +68,7 @@ run_bench() {
 }
 
 run_bench;
-cd tantivy/fastfield_codecs || exit
+cd tantivy/columnar || exit
 run_bench;
 
 
