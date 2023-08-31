@@ -67,7 +67,8 @@ fn main() -> std::io::Result<()> {
     let mut benchmarks = Vec::new();
     for dir_entry in paths.filter_map(|dir_entry| dir_entry.ok()) {
         let bench_test = dir_entry.file_name().to_str().unwrap().to_string();
-        let records = get_records(std::fs::File::open(dir_entry.path()).unwrap());
+        let records =
+            get_records_from_file_and_dedup(std::fs::File::open(dir_entry.path()).unwrap());
         let bench_data_uplot = get_uplot_prepared_data(&records);
 
         let commit_hashs = records
@@ -102,9 +103,9 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn get_records<R: Read>(reader: R) -> Vec<Record> {
+fn get_records_from_file_and_dedup<R: Read>(reader: R) -> Vec<Record> {
     let mut rdr = csv::Reader::from_reader(reader);
-    let mut records = vec![];
+    let mut records = Vec::new();
 
     for result in rdr.records() {
         let record: StringRecord = result.unwrap();
@@ -113,13 +114,15 @@ fn get_records<R: Read>(reader: R) -> Vec<Record> {
         records.push(record);
     }
     records.sort_by_key(|record| record.commit_ts);
+    // Uplot can't handle duplicate timestamps, so we dedup them
+    records.dedup_by_key(|el| el.commit_ts);
     records
 }
 
 fn get_uplot_prepared_data(records: &[Record]) -> [Vec<u64>; 3] {
-    let mut timestamps = vec![];
-    let mut duration = vec![];
-    let mut variance = vec![];
+    let mut timestamps = Vec::new();
+    let mut duration = Vec::new();
+    let mut variance = Vec::new();
 
     for record in records {
         timestamps.push(record.get_selected_date_as_timestamp());

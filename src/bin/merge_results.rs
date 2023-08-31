@@ -5,6 +5,10 @@ use std::{
     path::PathBuf,
 };
 
+/// A benchmarks is identified via the last part of the path.
+/// This allows to keep track of benchmarks when they are moved to a different module.
+///
+/// This script merges all benchmarks with the same id into one file.
 fn main() {
     let entries = fs::read_dir("./bench_results").unwrap();
 
