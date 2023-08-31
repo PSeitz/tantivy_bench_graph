@@ -20,6 +20,7 @@ struct Record {
     commit_ts: u64,
     /// The tool accepts a date for which the closest commit is selected
     /// Format: 2022-09-19
+    /// This is the timestamp used in the graph. That's not ideal, but makes nices graphs.
     selected_date: String,
     rustc_version: String,
     run_date_ts: i64,
@@ -113,9 +114,13 @@ fn get_records_from_file_and_dedup<R: Read>(reader: R) -> Vec<Record> {
 
         records.push(record);
     }
+
+    // Uplot can't handle duplicate timestamps in the graph, so we dedup them
+    // selected_date is the property used in the graph for the time axis
+    records.sort_by_key(|record| record.selected_date.clone());
+    records.dedup_by_key(|el| el.selected_date.clone());
+
     records.sort_by_key(|record| record.commit_ts);
-    // Uplot can't handle duplicate timestamps, so we dedup them
-    //records.dedup_by_key(|el| el.commit_ts);
     records
 }
 
