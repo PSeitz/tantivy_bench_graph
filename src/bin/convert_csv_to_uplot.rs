@@ -115,7 +115,7 @@ fn get_records_from_file_and_dedup<R: Read>(reader: R) -> Vec<Record> {
     }
     records.sort_by_key(|record| record.commit_ts);
     // Uplot can't handle duplicate timestamps, so we dedup them
-    records.dedup_by_key(|el| el.commit_ts);
+    //records.dedup_by_key(|el| el.commit_ts);
     records
 }
 
