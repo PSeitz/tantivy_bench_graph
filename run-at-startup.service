@@ -1,0 +1,17 @@
+systemd service on startup with autoshutdown after test
+[ec2-user@ip-172-31-93-151 ~]$ cat /etc/systemd/system/run-at-startup.service
+
+[Unit]
+Description=Run script at startup after network becomes reachable
+After=default.target
+
+[Service]
+Type=simple
+RemainAfterExit=yes
+User=ec2-user
+ExecStart=/bin/bash -c 'source /home/ec2-user/.profile && /home/ec2-user/tantivy_bench_graph/run_bench_ci.sh && sudo shutdown -h +15'
+WorkingDirectory=/home/ec2-user/tantivy_bench_graph
+TimeoutStartSec=infinity
+
+[Install]
+WantedBy=default.target
