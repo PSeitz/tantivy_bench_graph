@@ -9,12 +9,12 @@ Regular rust benchmarks are run with `cargo bench` and then converted to csv wit
 ## Usage
 The script will run once for each day and selects the latest commit on that day.
 
-### Benchmark a date range
+#### Benchmark a date range
 `./bench_dates_tantivy -s 2022-08-01 -e 2022-09-01`
-### Benchmark a single day
+#### Benchmark a single day
 `./bench_tantivy -d 2022-09-22`
 
-### Automated in CI
+#### Automated in CI
 This repo is also the storage for the runs and serves a UI.
 `run_bench_ci.sh` will run and commit the results to the repo.
 
